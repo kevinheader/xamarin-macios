@@ -3,6 +3,8 @@
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 WORKSPACE=$(pwd)
 
+env | sort
+
 report_error ()
 {
 	printf "🔥 [Test run failed](%s) 🔥\\n" "$URL" >> "$WORKSPACE/jenkins/pr-comments.md"
