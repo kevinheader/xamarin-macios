@@ -185,6 +185,7 @@ def reportFinalStatus (err, gitHash, currentStage)
         if (err.contains ("FlowInterruptedException") || err.contains ("AbortException"))
             comment += "❌ [Build was (probably) aborted](${env.RUN_DISPLAY_URL})\n\n"
         comment += "🔥 [Jenkins job](${env.RUN_DISPLAY_URL}) (on internal Jenkins) failed"
+        failedStages = failedStages.unique ()
         if (currentStage != "" && !failedStages.contains (currentStage))
             failedStages.add (currentStage)
         if (failedStages.size () > 0)
