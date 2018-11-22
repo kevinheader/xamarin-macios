@@ -172,7 +172,7 @@ build-test-libraries:
 	@$(MAKE) -C $(TOP)/tests/test-libraries
 
 Makefile.inc: xharness/xharness.exe
-	$(Q_GEN) $(SYSTEM_MONO) --debug $(XIBUILD_EXE_PATH) -t -- $(CURDIR)/$< $(XHARNESS_VERBOSITY) --configure --autoconf --rootdir $(CURDIR)
+	$(Q_GEN) $(SYSTEM_MONO) --debug $(CURDIR)/$< $(XHARNESS_VERBOSITY) --configure --autoconf --rootdir $(CURDIR)
 
 -include Makefile.inc
 
@@ -183,7 +183,7 @@ $(GUI_UNIT_PATH)/bin/xammac_mobile/GuiUnit.exe:
 	TargetFrameworkFallbackSearchPaths=$(MAC_DESTDIR)/Library/Frameworks/Mono.framework/External/xbuild-frameworks MSBuildExtensionsPathFallbackPathsOverride=$(MAC_DESTDIR)/Library/Frameworks/Mono.framework/External/xbuild XamarinMacFrameworkRoot=$(MAC_DESTDIR)/Library/Frameworks/Xamarin.Mac.framework/Versions/Current $(SYSTEM_XIBUILD) -- $(XBUILD_VERBOSITY) $(GUI_UNIT_PATH)/src/framework/GuiUnit_xammac_mobile.csproj
 
 Makefile-mac.inc: xharness/xharness.exe
-	$(Q_GEN) $(SYSTEM_MONO) --debug $(XIBUILD_EXE_PATH) -t -- $(CURDIR)/$< $(XHARNESS_VERBOSITY) --configure  --autoconf --mac --rootdir $(CURDIR)
+	$(Q_GEN) $(SYSTEM_MONO) --debug $(CURDIR)/$< $(XHARNESS_VERBOSITY) --configure  --autoconf --mac --rootdir $(CURDIR)
 
 -include Makefile-mac.inc
 
@@ -195,11 +195,11 @@ $(TOP)/tools/mtouch/SdkVersions.cs: $(TOP)/tools/common/SdkVersions.cs.in
 	@touch $@
 
 xharness/xharness.exe: $(wildcard xharness/*.cs) xharness/xharness.csproj $(TOP)/tools/mtouch/SdkVersions.cs test.config test-system.config .stamp-src-project-files
-	make -j8 -C $(TOP)/external/mono/mcs/class -i do-test PROFILE=MONOTOUCH # TODO: This should not be needed and we should get the dlls from the SDK.
-	make -j8 -C $(TOP)/external/mono/mcs/class -i do-xunit-test PROFILE=MONOTOUCH # TODO: This should not be needed and we should get the dlls from the SDK.
+	#make -j8 -C $(TOP)/external/mono/mcs/class -i do-test PROFILE=MONOTOUCH # TODO: This should not be needed and we should get the dlls from the SDK.
+	#make -j8 -C $(TOP)/external/mono/mcs/class -i do-xunit-test PROFILE=MONOTOUCH # TODO: This should not be needed and we should get the dlls from the SDK.
 	nuget restore xharness/xharness.csproj
 	nuget restore bcl-test/BCLTests/BCLTests.csproj
-	$(Q_GEN) $(SYSTEM_XIBUILD) -- $(MSBUILD_VERBOSITY_QUIET) xharness/xharness.csproj
+	$(Q_GEN) $(SYSTEM_MSBUILD) $(MSBUILD_VERBOSITY_QUIET) xharness/xharness.csproj
 
 killall:
 	@killall "iPhone Simulator" >/dev/null 2>&1 || true
@@ -353,7 +353,7 @@ wrench-%:
 
 wrench-jenkins: xharness/xharness.exe
 	$(Q) rm -f $@-failed.stamp
-	$(Q) ulimit -n 4096 && $(SYSTEM_MONO) --trace=E:all --debug $(XIBUILD_EXE_PATH) -t -- $(CURDIR)/$< $(XHARNESS_VERBOSITY) --jenkins --autoconf --rootdir $(CURDIR) --sdkroot $(XCODE_DEVELOPER_ROOT) --label run-all-tests,skip-ios-device-tests --markdown-summary=$(abspath $(CURDIR))/TestSummary.md $(TESTS_PERIODIC_COMMAND) || echo "$$?" > $@-failed.stamp
+	$(Q) ulimit -n 4096 && $(SYSTEM_MONO) --trace=E:all --debug $(CURDIR)/$< $(XHARNESS_VERBOSITY) --jenkins --autoconf --rootdir $(CURDIR) --sdkroot $(XCODE_DEVELOPER_ROOT) --label run-all-tests,skip-ios-device-tests --markdown-summary=$(abspath $(CURDIR))/TestSummary.md $(TESTS_PERIODIC_COMMAND) || echo "$$?" > $@-failed.stamp
 	@echo "@MonkeyWrench: SetSummary: <br/>`cat $(abspath $(CURDIR))/TestSummary.md | awk 1 ORS='<br/>'`"
 	@echo "@MonkeyWrench: AddFile: $(abspath $(CURDIR))/TestSummary.md"
 	$(Q) if test -e $@-failed.stamp; then EC=`cat $@-failed.stamp`; rm -f $@-failed.stamp; exit $$EC; fi
@@ -362,12 +362,12 @@ wrench-xtro:
 	@echo Not here anymore
 
 jenkins: xharness/xharness.exe
-	$(Q) $(SYSTEM_MONO) --trace=E:all --debug $(XIBUILD_EXE_PATH) -t -- $(CURDIR)/$< $(XHARNESS_VERBOSITY) --jenkins --autoconf --rootdir $(CURDIR) --sdkroot $(XCODE_DEVELOPER_ROOT) --markdown-summary=$(abspath $(CURDIR))/TestSummary.md
+	$(Q) $(SYSTEM_MONO) --trace=E:all --debug $(CURDIR)/$< $(XHARNESS_VERBOSITY) --jenkins --autoconf --rootdir $(CURDIR) --sdkroot $(XCODE_DEVELOPER_ROOT) --markdown-summary=$(abspath $(CURDIR))/TestSummary.md
 
 # This will launch xharness' interactive test runner in the system's default browser
 runner: xharness/xharness.exe
 	@echo "Running xharness in server mode. Press Ctrl-C to exit (or click Quit / press Q in the browser page)"
-	$(Q) $(SYSTEM_XIBUILD) -t -- $(CURDIR)/xharness/xharness.exe $(XHARNESS_VERBOSITY) --jenkins:server --autoconf --rootdir $(CURDIR) --sdkroot $(XCODE_DEVELOPER_ROOT)
+	$(Q) $(SYSTEM_MONO) $(CURDIR)/xharness/xharness.exe $(XHARNESS_VERBOSITY) --jenkins:server --autoconf --rootdir $(CURDIR) --sdkroot $(XCODE_DEVELOPER_ROOT)
 
 # This makefile target will run the device tests using the Xamarin.iOS version
 # installed on the system.
