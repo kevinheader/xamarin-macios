@@ -321,7 +321,7 @@ namespace xsiminstaller {
 					try {
 						var packageInfoPath = Path.Combine (expanded_path, "PackageInfo");
 						var packageInfo = File.ReadAllText (packageInfoPath);
-						var modifiedPackageInfo = packageInfo.Replace ("<pkg-info auth=\"root\" identifier=\"com.apple.pkg", "<pkg-info install-location=\"" + installPrefix + "\" auth=\"root\" identifier=\"com.apple.pkg");
+						var modifiedPackageInfo = packageInfo.Replace ("<pkg-info ", "<pkg-info install-location=\"" + installPrefix + "\" ");
 						if (packageInfo == modifiedPackageInfo) {
 							Console.WriteLine ($"Failed to modify PackageInfo:");
 							Console.WriteLine (packageInfo);
